@@ -80,9 +80,9 @@ def tangents(c1, c2, c3): # initial derivative of squeezing parameter
 N = 26400 # atom number
 iters = 10**5 # number of trajectories
 nt = 100 # number of time steps
-tf = 18 # final time
+tf = 5 # final time
 t = np.linspace(0, tf, nt) # time range
-c1, c2, c3 = 1, 0.045, 0 # hamiltonian coefficients
+c1, c2, c3 = 1, 21, 0 # hamiltonian coefficients
 
 # we generate hamiltonian, its derivative and step function that substitutes trajectory parameters for field operators
 H = hamiltonian(c1, c2, c3)
@@ -110,3 +110,25 @@ state_vec = np.load('data.npy')
 results = {}
 for m in range(1, f + 1):
     results[m] = [squeezing(m, N, state) for state in state_vec]
+
+#%% plotting results
+        
+colors = ['blue', 'orange', 'green']
+pl.rcParams['font.size'] = 13
+pl.rcParams['font.serif'] = "Times"
+pl.rcParams['mathtext.fontset'] = 'cm'
+
+for m in range(1, f + 1):
+    pl.plot(t, [x[0] for x in results[m]], c = colors[m - 1])
+    
+tan = tangents(c1, c2, c3)
+pl.plot(t, [1 - tan[m - 1]*time for time in t], '--', c = "black")
+
+pl.xlabel(r"Time of evolution $[N\hbar/c_1]$", fontsize = 13)
+pl.legend([r"$\xi^2_" + str(m) + r"$" for m in range(1, f + 1)] +\
+          [r"$1 - \beta_{1/2/3}t$" for m in range(1, f + 1)], loc = 4)
+pl.yscale('log')
+pl.ylim([10**-3, 2])
+pl.text(1.4, 0.002, r"$c_2/c_1=21,\, c_3/c_1=0$")
+pl.text(4.9, 1, "(a)")
+pl.show()
